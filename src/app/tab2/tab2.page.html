@@ -1,17 +1,40 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
+  <ion-toolbar color="dark">
     <ion-title>
-      Tab 2
+      Histórico
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" color="medium">
+  <ion-item-sliding *ngFor="let historico of listaHistoricos">
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+    <ion-item lines="full">
+      <div slot="start">
+        <br />
+        <br />
+        <ion-icon color="sucess" name="qr-code"></ion-icon>
+      </div>
+
+      <ion-label>
+        <div>
+          <p class="ion-text-right line">
+            {{historico.dataHora | date: 'shot' : '' : 'pt'}}
+          </p>
+          <p class="resultado">
+            {{historico.leitura}}
+          </p>
+        </div>
+      </ion-label>
+      <div slot="end">
+        <ion-icon color="primary" name="calendar"></ion-icon>
+      </div>
+    </ion-item>
+
+    <ion-item-options side="end">
+      <ion-item-option color="danger" (click)="delete(historico.$key)">
+        <ion-icon slot="icon-only" name="trash"></ion-icon>
+      </ion-item-option>
+    </ion-item-options>
+  </ion-item-sliding>
 </ion-content>

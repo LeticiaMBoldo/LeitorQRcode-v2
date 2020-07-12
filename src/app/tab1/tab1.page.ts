@@ -7,6 +7,8 @@ import { AlertController, Platform } from '@ionic/angular';
 import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
 //importar o screen orientation
 import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
+import { HistoricoService } from '../servicos/historico.service';
+import { Historico } from '../models/historico';
 
 @Component({
   selector: 'app-tab1',
@@ -29,7 +31,8 @@ export class Tab1Page {
     public alertController: AlertController,
     public platform: Platform,
     private screenOrientation: ScreenOrientation,
-    private cdRef: ChangeDetectorRef) 
+    private cdRef: ChangeDetectorRef,
+    private historicoService:HistoricoService) 
     {
       
         // set to portrait
@@ -51,7 +54,7 @@ export class Tab1Page {
     }
 
 
-  public lerQRCode(){
+  public async lerQRCode(){
     // Optionally request the permission early
     this.qrScanner.prepare()
     .then((status: QRScannerStatus) => {
@@ -69,7 +72,7 @@ export class Tab1Page {
         this.qrScanner.show();
 
         // start scanning
-        this.leitorQrCode = this.qrScanner.scan().subscribe((text: string) => {
+        this.leitorQrCode = this.qrScanner.scan().subscribe(async(text: string) => {
           
           this.leitura = (text['result']) ? text['result'] : text;
 
@@ -84,8 +87,19 @@ export class Tab1Page {
           //this.presentAlert('LEITURA: ', this.leitura);
           this.verifivaLink(this.leitura);
           this.cdRef.detectChanges();
-        });
 
+          //salvar o historico
+          const historico = new Historico();
+          historico.leitura = this.leitura;
+          historico.dataHora = new Date();
+
+          await this.historicoService.create(historico).then(resposta =>{
+            console.log(resposta);
+          }).catch(erro => {
+            this.presentAlert('ERRO!', 'Erro ao salvar no Firebase.');
+            console.log('ERRO', erro);
+          })
+        });
       } else if (status.denied) {
         // camera permission was permanently denied
         // you must use QRScanner.openSettings() method to guide the user to the settings page
